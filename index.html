@@ -47,13 +47,14 @@
 
     <!-- Page Content -->
     <div class="container-fluid">
-        <h1 class="text-center mt-4 mb-5">Ignite Potential Calculator</h1>
+        <h1 class="text-center mt-4 mb-5"><i class="bi bi-fire me-2"></i>Ignite Potential Calculator</h1>
 
         <div class="row justify-content-center">
             <div class="col-md-10">
 
                 <form id="calculator-form">
-                    <div class="row justify-content-center">
+                    <div class="row justify-content-center position-relative">
+                        <button id="shareButton" class="btn btn-light w-auto position-absolute start-auto top-0 end-0">Share this ignite <i class="bi bi-share-fill ms-2"></i></button>
                         <div class="col-md-6">
                             <div class="card mb-4">
                                 <div class="card-body">
@@ -110,7 +111,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6 align-self-center">
+                        <div class="position-relative col-md-6 align-self-center">
                             <div class="d-flex flex-column my-auto px-5">
                                     <!-- Toggle Buttons -->
                                     <div class="mt-3 mb-5">
@@ -349,28 +350,30 @@
         isUpdatingFromTotal = false;
     }
 
+    // Function to load values from URL parameters or cookies
+    function loadValues() {
+        const params = new URLSearchParams(window.location.search);
 
-    // Function to load saved cookie values into the form
-    function loadSavedValues() {
-        // Load the 1-5 fields from cookies
-        document.getElementById('criticalfirespell1').value = getCookie('criticalfirespell1') || '';
-        document.getElementById('criticalfirespell2').value = getCookie('criticalfirespell2') || '';
-        document.getElementById('criticalfirespell3').value = getCookie('criticalfirespell3') || '';
-        document.getElementById('criticalfirespell4').value = getCookie('criticalfirespell4') || '';
-        document.getElementById('criticalfirespell5').value = getCookie('criticalfirespell5') || '';
+        // Load the 1-5 fields from URL params or cookies
+        document.getElementById('criticalfirespell1').value = params.get('spell1') || getCookie('criticalfirespell1') || '';
+        document.getElementById('criticalfirespell2').value = params.get('spell2') || getCookie('criticalfirespell2') || '';
+        document.getElementById('criticalfirespell3').value = params.get('spell3') || getCookie('criticalfirespell3') || '';
+        document.getElementById('criticalfirespell4').value = params.get('spell4') || getCookie('criticalfirespell4') || '';
+        document.getElementById('criticalfirespell5').value = params.get('spell5') || getCookie('criticalfirespell5') || '';
 
-        // Load the switches from cookies
-        document.getElementById('darkmoonFaire').checked = getCookie('darkmoonFaire') === 'true';
-        document.getElementById('powerInfusion').checked = getCookie('powerInfusion') === 'true';
-        document.getElementById('undeadCleansing').checked = getCookie('undeadCleansing') === 'true';
-        document.getElementById('curseOfElements').checked = getCookie('curseOfElements') === 'true';
-        document.getElementById('nightfall').checked = getCookie('nightfall') === 'true';
-        document.getElementById('scorchX5').checked = getCookie('scorchX5') === 'true';
+        // Load the switches from URL params or cookies
+        document.getElementById('darkmoonFaire').checked = (params.get('dmf') !== null) ? params.get('dmf') === 'true' : getCookie('darkmoonFaire') === 'true';
+        document.getElementById('powerInfusion').checked = (params.get('pi') !== null) ? params.get('pi') === 'true' : getCookie('powerInfusion') === 'true';
+        document.getElementById('undeadCleansing').checked = (params.get('udc') !== null) ? params.get('udc') === 'true' : getCookie('undeadCleansing') === 'true';
+        document.getElementById('curseOfElements').checked = (params.get('coe') !== null) ? params.get('coe') === 'true' : getCookie('curseOfElements') === 'true';
+        document.getElementById('nightfall').checked = (params.get('nf') !== null) ? params.get('nf') === 'true' : getCookie('nightfall') === 'true';
+        document.getElementById('scorchX5').checked = (params.get('sc5') !== null) ? params.get('sc5') === 'true' : getCookie('scorchX5') === 'true';
     }
+
 
     // Load saved values on page load
     document.addEventListener('DOMContentLoaded', function () {
-        loadSavedValues();
+        loadValues();
         updateTotalAndCalculate(); // Initial calculation after loading
     });
 
@@ -386,6 +389,42 @@
                 updateTotalAndCalculate();
             }
         }
+    });
+
+    // Function to generate a shareable URL
+    function generateShareableURL() {
+        const params = new URLSearchParams();
+
+        // Add the input fields values with shorter parameter names
+        params.set('spell1', document.getElementById('criticalfirespell1').value);
+        params.set('spell2', document.getElementById('criticalfirespell2').value);
+        params.set('spell3', document.getElementById('criticalfirespell3').value);
+        params.set('spell4', document.getElementById('criticalfirespell4').value);
+        params.set('spell5', document.getElementById('criticalfirespell5').value);
+
+        // Add the switch values with shorter parameter names
+        params.set('dmf', document.getElementById('darkmoonFaire').checked);
+        params.set('pi', document.getElementById('powerInfusion').checked);
+        params.set('udc', document.getElementById('undeadCleansing').checked);
+        params.set('coe', document.getElementById('curseOfElements').checked);
+        params.set('nf', document.getElementById('nightfall').checked);
+        params.set('sc5', document.getElementById('scorchX5').checked);
+
+        // Create the full URL
+        const shareableURL = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+
+        // Copy the URL to the clipboard
+        navigator.clipboard.writeText(shareableURL).then(() => {
+            alert('Shareable URL copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+
+    // Event listener for the share button
+    document.getElementById('shareButton').addEventListener('click', function (e) {
+        e.preventDefault();
+        generateShareableURL();
     });
 </script>
 
